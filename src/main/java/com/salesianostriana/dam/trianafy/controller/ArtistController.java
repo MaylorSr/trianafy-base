@@ -1,9 +1,6 @@
 package com.salesianostriana.dam.trianafy.controller;
 
 import com.salesianostriana.dam.trianafy.model.Artist;
-
-import com.salesianostriana.dam.trianafy.model.Song;
-import com.salesianostriana.dam.trianafy.repos.ArtistRepository;
 import com.salesianostriana.dam.trianafy.service.ArtistService;
 import com.salesianostriana.dam.trianafy.service.SongService;
 import lombok.RequiredArgsConstructor;
@@ -12,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/artist")
@@ -21,7 +17,6 @@ public class ArtistController {
 
     private final ArtistService artistService;
     private final SongService songService;
-    private final ArtistRepository artistRepository;
 
     @GetMapping("/")
     public ResponseEntity<List<Artist>> findAll() {
@@ -63,18 +58,16 @@ public class ArtistController {
         }));
     }
 
-    /**
-     * @param id
-     * @return
-     * @DeleteMapping("/{id}") public ResponseEntity<List<Song>> delete(@PathVariable Long id) {
-     * if (artistService.findById(id).isPresent()) {
-     * return songService.findAll();
-     * }
-     * <p>
-     * /*
-     * return ResponseEntity.noContent().build();
-     * <p>
-     * }
-     */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        if (artistService.findById(id).isPresent()) {
+            Artist a = artistService.findById(id).orElse(null);
+            songService.findAll()
+                    .stream().filter(song -> song.getArtist().equals(a)).forEach(song -> song.setArtist(null));
+            artistService.deleteById(id);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
 
 }
