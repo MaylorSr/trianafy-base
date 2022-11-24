@@ -6,8 +6,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class TrianafyBaseApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(TrianafyBaseApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(TrianafyBaseApplication.class, args);
+    }
 
 }

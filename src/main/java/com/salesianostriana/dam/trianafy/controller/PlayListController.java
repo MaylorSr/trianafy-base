@@ -1,7 +1,8 @@
 package com.salesianostriana.dam.trianafy.controller;
 
-import com.salesianostriana.dam.trianafy.dto.*;
-import com.salesianostriana.dam.trianafy.model.Artist;
+import com.salesianostriana.dam.trianafy.dto.CreatePlayListDto;
+import com.salesianostriana.dam.trianafy.dto.PlayListDtoConverter;
+import com.salesianostriana.dam.trianafy.dto.PlayListResponse;
 import com.salesianostriana.dam.trianafy.model.Playlist;
 import com.salesianostriana.dam.trianafy.model.Song;
 import com.salesianostriana.dam.trianafy.service.PlaylistService;
@@ -95,6 +96,7 @@ public class PlayListController {
         );
     }
 
+
     /***********************************************************************************************************************************************************/
     @GetMapping("/{id}/song")
     public ResponseEntity<List<Song>> findAll(@PathVariable Long id) {
@@ -108,11 +110,12 @@ public class PlayListController {
     /**
      * De una lista, obtener datos de una cancion en concreto
 
-     @GetMapping("/{id1}/song/{id2}") public ResponseEntity<Song> findByIds(@PathVariable Long id1, Long id2) {
-     if (playlistService.findById(id1).isPresent()) {
-     Playlist listSong = playlistService.findById(id1).orElse(null);
 
-     return ResponseEntity.ok();
+     @GetMapping("/{id1}/song/{id2}") public ModelAndView findByIds(@PathVariable Long id1, Long id2) {
+     if (playlistService.findById(id1).isPresent()) {
+     Song sonSelected = songService.findById(id2).orElse(null);
+     return ModelAndView();
+
      }
      return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
      }

@@ -1,11 +1,8 @@
 package com.salesianostriana.dam.trianafy.service;
 
 
-import com.salesianostriana.dam.trianafy.dto.PlayListResponse2;
 import com.salesianostriana.dam.trianafy.model.Playlist;
-import com.salesianostriana.dam.trianafy.model.Song;
 import com.salesianostriana.dam.trianafy.repos.PlaylistRepository;
-import com.salesianostriana.dam.trianafy.repos.SongRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -41,7 +38,6 @@ public class PlaylistService {
     public void deleteById(Long id) {
         repository.deleteById(id);
     }
-
 
 
 }

@@ -5,7 +5,6 @@ import com.salesianostriana.dam.trianafy.dto.SongDtoConverter;
 import com.salesianostriana.dam.trianafy.dto.SongResponse;
 import com.salesianostriana.dam.trianafy.model.Artist;
 import com.salesianostriana.dam.trianafy.model.Song;
-import com.salesianostriana.dam.trianafy.repos.SongRepository;
 import com.salesianostriana.dam.trianafy.service.ArtistService;
 import com.salesianostriana.dam.trianafy.service.SongService;
 import lombok.RequiredArgsConstructor;
@@ -64,18 +63,24 @@ public class SongController {
     }
 
     /**
-     @PutMapping("/{id}") public ResponseEntity<Song> editSong(@RequestBody Song song, @PathVariable Long id) {
+     * FALTA EL EDITAR DE SONG
+     *
+     * @param song
+     * @param id
+     * @return
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<SongResponse> editSong(@RequestBody Song song, @PathVariable Long id) {
 
-     Song data = songService.findById(id).orElse(null);
+        Song data = songService.findById(id).orElse(null);
 
-     if (data.getId() == null) {
-     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-     } else if (data.getId() != null && data.getTitle() != "" && data.getAlbum() != "") {
-     return ResponseEntity.of(dtoConverter::songToSongResponse ());
+        if (data.getId() == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        } else if (data.getId() != null && data.getTitle() != "" && data.getAlbum() != "") {
+            return ResponseEntity.ok().body(dtoConverter.songToSongResponse(song));
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 
-     }
-     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-
-     }*/
+    }
 
 }

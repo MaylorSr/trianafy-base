@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class SongResponse {
-    private String tittle, album, year, artist;
+    private String title, album, year, artist;
 
 
 }

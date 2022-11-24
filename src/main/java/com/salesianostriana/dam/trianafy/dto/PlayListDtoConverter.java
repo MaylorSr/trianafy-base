@@ -16,11 +16,23 @@ public class PlayListDtoConverter {
     }
 
     public PlayListResponse PlayListToPlayListResponse(Playlist p) {
-        PlayListResponse result = new PlayListResponse();
-        result.setId(p.getId());
-        result.setName(p.getName());
-        result.setNumberOfSongs(p.getSongs().size());
-        return result;
+        return PlayListResponse
+                .builder()
+                .id(p.getId())
+                .name(p.getName())
+                .numberOfSongs(p.getSongs().size())
+                .build();
     }
+
+    public SongResponse songToSongResponse(Song song) {
+        return SongResponse
+                .builder()
+                .title(song.getTitle())
+                .artist(song.getArtist().getName())
+                .album(song.getAlbum())
+                .year(song.getYear())
+                .build();
+    }
+
 
 }
