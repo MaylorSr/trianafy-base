@@ -24,8 +24,6 @@ public class SongController {
     private final SongService songService;
     private final SongDtoConverter dtoConverter;
 
-    private final SongResponse songResponse;
-
     @GetMapping("/")
     public ResponseEntity<List<Song>> findAll() {
         if (songService.findAll().isEmpty()) {
