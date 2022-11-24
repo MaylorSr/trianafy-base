@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -109,16 +111,22 @@ public class PlayListController {
 
     /**
      * De una lista, obtener datos de una cancion en concreto
-
-
-     @GetMapping("/{id1}/song/{id2}") public ModelAndView findByIds(@PathVariable Long id1, Long id2) {
-     if (playlistService.findById(id1).isPresent()) {
-     Song sonSelected = songService.findById(id2).orElse(null);
-     return ModelAndView();
-
-     }
-     return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-     }
      */
+    @GetMapping("/{id1}/song/{id2}")
+    public ModelAndView findByIds(@PathVariable Long id1, Long id2) {
+        if (playlistService.findById(id1).isPresent() && songService.findById(id2).isPresent()) {
+            return new ModelAndView("/song/" + id2);
+        }
+        return new ModelAndView((View) ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+
+    @GetMapping("/song/{id}")
+    public ResponseEntity<Song> getDetailsSong(@PathVariable Long id) {
+        if (songService.findById(id).isPresent()) {
+            return ResponseEntity.of(songService.findById(id));
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
 
 }
