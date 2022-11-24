@@ -7,11 +7,20 @@ import com.salesianostriana.dam.trianafy.model.Artist;
 import com.salesianostriana.dam.trianafy.model.Song;
 import com.salesianostriana.dam.trianafy.service.ArtistService;
 import com.salesianostriana.dam.trianafy.service.SongService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.util.List;
 
 @RestController
@@ -23,6 +32,29 @@ public class SongController {
     private final SongService songService;
     private final SongDtoConverter dtoConverter;
 
+    @Operation(summary = "Obtienes una lista de todos las canciones")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Canciones encontrados",
+                    content = {@Content(mediaType = "application/json",
+                            array = @ArraySchema(schema = @Schema(implementation = Song.class)),
+                            examples = {@ExampleObject(
+                                    value = """
+                                            [
+                                            {"id": 1, "title": "Ahora dice (remix)", 
+                                            "album": "Ahora dice (remix)", "year":"2020",
+                                            "artist": {"id": 1,"name": "Anuel AA, JBalvin"}"},
+                                             
+                                            {"id": 2, "title": "Mi Casa", 
+                                            "album": "Mi Casa", "year":"2020",
+                                            "artist": {"id": 2,"name": "Cruz Cafuné"}"}
+                                                                                 
+                                            ]
+                                            """
+                            )}
+                    )}),
+            @ApiResponse(responseCode = "404", description = "No se ha encontrado ninguna lista",
+                    content = @Content)})
+
     @GetMapping("/")
     public ResponseEntity<List<Song>> findAll() {
         if (songService.findAll().isEmpty()) {
@@ -31,16 +63,48 @@ public class SongController {
         return ResponseEntity.ok(songService.findAll());
     }
 
+    @Operation(summary = "Obtiene una canción por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Canción encontrado",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class),
+                            examples = {@ExampleObject(
+                                    value = """                                            
+                                            {"id": 2, "title": "Mi Casa", 
+                                            "album": "Mi Casa", "year":"2020",
+                                            "artist": {"id": 2,"name": "Cruz Cafuné"}"}
+                                            """
+                            )}
+                    )}),
+            @ApiResponse(responseCode = "404", description = "No se ha encontrado nignua canción",
+                    content = @Content),
+    })
+
     @GetMapping("/{id}")
-    public ResponseEntity<Song> findById(@PathVariable Long id) {
+    public ResponseEntity<Song> findById(@PathParam("ID") @Parameter(description = "Poner el ID de la canción") @PathVariable Long id) {
         if (songService.findById(id).isPresent()) {
             return ResponseEntity.of(songService.findById(id));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @Operation(summary = "Elimina una canción por su ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Canción eliminada",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class),
+                            examples = {@ExampleObject(
+                                    value = """                                            
+                                            {""}
+                                            """
+                            )}
+                    )}),
+            @ApiResponse(responseCode = "404", description = "No se ha encontrado nignua canción",
+                    content = @Content),
+    })
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<Song> delete(@PathVariable Long id) {
+    public ResponseEntity<Song> delete(@PathParam("ID") @Parameter(description = "Poner el ID de la canción a eliminar") @PathVariable Long id) {
         if (songService.findById(id).isPresent()) {
             songService.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -48,6 +112,23 @@ public class SongController {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+
+    @Operation(summary = "Añadir una canción ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Canción creada",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class),
+                            examples = {@ExampleObject(
+                                    value = """                                            
+                                            {"id": 2, "title": "Mi Casa", 
+                                            "album": "Mi Casa", "year":"2020",
+                                            "artist": {"id": 2,"name": "Cruz Cafuné"}"}
+                                            """
+                            )}
+                    )}),
+            @ApiResponse(responseCode = "400", description = "No se ha introducido los datos de manera correcta",
+                    content = @Content),
+    })
     @PostMapping("/")
     public ResponseEntity<Song> create(@RequestBody CreateSongDto dto) {
         if (dto.getArtistId() != null && dto.getTitle() != "" && dto.getAlbum() != "") {
@@ -62,15 +143,35 @@ public class SongController {
         return ResponseEntity.badRequest().build();
     }
 
+
+    @Operation(summary = "Editar una canción por su ID ")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Canción editada",
+                    content = {@Content(mediaType = "application/json",
+                            schema = @Schema(implementation = Song.class),
+                            examples = {@ExampleObject(
+                                    value = """                                            
+                                            {"id": 2, "title": "Mi Casa", 
+                                            "album": "Mi Casa", "year":"2020",
+                                            "artist": {"id": 2,"name": "Cruz Cafuné"}"}
+                                            """
+                            )}
+                    )}),
+            @ApiResponse(responseCode = "400", description = "No se ha introducido los datos de manera correcta",
+                    content = @Content),
+            @ApiResponse(responseCode = "404", description = "No se ha encontrado ninguna canción",
+                    content = @Content)
+    })
+
     /**
-     * FALTA EL EDITAR DE SONG
-     *
+     * FALTA EL EDITAR DE SONG, NO SE EDITA NO SÉ PORQUÉ
      * @param song
      * @param id
      * @return
      */
     @PutMapping("/{id}")
-    public ResponseEntity<SongResponse> editSong(@RequestBody Song song, @PathVariable Long id) {
+    public ResponseEntity<SongResponse> editSong(@PathParam("ID") @Parameter(description = "Poner el ID de la canción a editar")
+                                                 @RequestBody Song song, @PathVariable Long id) {
 
         Song data = songService.findById(id).orElse(null);
 
