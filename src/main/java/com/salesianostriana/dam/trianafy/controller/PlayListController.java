@@ -3,6 +3,7 @@ package com.salesianostriana.dam.trianafy.controller;
 import com.salesianostriana.dam.trianafy.dto.CreatePlayListDto;
 import com.salesianostriana.dam.trianafy.dto.PlayListDtoConverter;
 import com.salesianostriana.dam.trianafy.dto.PlayListResponse;
+import com.salesianostriana.dam.trianafy.dto.SongResponse;
 import com.salesianostriana.dam.trianafy.model.Playlist;
 import com.salesianostriana.dam.trianafy.model.Song;
 import com.salesianostriana.dam.trianafy.service.PlaylistService;
@@ -96,7 +97,7 @@ public class PlayListController {
     @GetMapping("/{id}")
     public ResponseEntity<Playlist> findById(@PathParam("ID") @Parameter(description = "Poner el ID de la playList") @PathVariable Long id) {
         if (playlistService.findById(id).isPresent()) {
-            return ResponseEntity.ok(playlistService.findById(id).orElse(null));
+            return ResponseEntity.ok(playlistService.findById(id).get());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -142,9 +143,10 @@ public class PlayListController {
 
         if (dto.getName() != "") {
             Playlist nuevo = dtoConverter.createPlayListDtoToPlayList(dto);
+            playlistService.add(nuevo);
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(playlistService.add(nuevo));
+                    .body(nuevo);
         }
         return ResponseEntity.badRequest().build();
     }
@@ -166,9 +168,9 @@ public class PlayListController {
             @ApiResponse(responseCode = "404", description = "No se ha encontrado esta playList",
                     content = @Content)})
     @PutMapping("/{id}")
-    public ResponseEntity<Playlist> editPlayList(@PathParam("ID") @Parameter(description = "Pasar el ID de la playList")
-                                                 @RequestBody PlayListResponse dto,
-                                                 @PathVariable Long id) {
+    public ResponseEntity<PlayListResponse> editPlayList(@PathParam("ID") @Parameter(description = "Pasar el ID de la playList")
+                                                         @RequestBody PlayListResponse dto,
+                                                         @PathVariable Long id) {
         if (!playlistService.findById(id).isPresent()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else if (dto.getName() == "") {
@@ -178,8 +180,10 @@ public class PlayListController {
         return ResponseEntity.of(
                 playlistService.findById(id).map(p -> {
                     p.setName(dto.getName());
+                    dto.setId(p.getId());
+                    dto.setNumberOfSongs(p.getSongs().size());
                     playlistService.edit(p);
-                    return p;
+                    return dto;
                 })
         );
     }
@@ -211,10 +215,9 @@ public class PlayListController {
             @ApiResponse(responseCode = "404", description = "No se ha encontrado la PlayList de canciones",
                     content = @Content)})
     @GetMapping("/{id}/song")
-    public ResponseEntity<List<Song>> findAll(@PathParam("ID") @Parameter(description = "Pasar el ID de la lista") @PathVariable Long id) {
+    public ResponseEntity<Playlist> findAll(@PathParam("ID") @Parameter(description = "Pasar el ID de la lista") @PathVariable Long id) {
         if (playlistService.findById(id).isPresent()) {
-            Playlist listSong = playlistService.findById(id).orElse(null);
-            return ResponseEntity.ok(listSong.getSongs());
+            return ResponseEntity.ok(playlistService.findById(id).orElse(null));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -247,12 +250,12 @@ public class PlayListController {
      * De una lista, obtener datos de una cancion en concreto
      */
     @GetMapping("/{id1}/song/{id2}")
-    public ResponseEntity<Song> findByIds(@PathParam("id1 id2")
-                                          @Parameter(description = "Pasar el id de la lista id1 y pasar el id de la canción id2")
-                                          @PathVariable("id1") Long id1,
-                                          @PathVariable("id2") Long id) {
+    public ResponseEntity<SongResponse> findByIds(@PathParam("id1 id2")
+                                                  @Parameter(description = "Pasar el id de la lista id1 y pasar el id de la canción id2")
+                                                  @PathVariable("id1") Long id1,
+                                                  @PathVariable("id2") Long id) {
         if (playlistService.findById(id1).isPresent() && songService.findById(id).isPresent()) {
-            return ResponseEntity.of(songService.findById(id));
+            return ResponseEntity.ok(dtoConverter.songToSongResponse(songService.findById(id).get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -275,12 +278,13 @@ public class PlayListController {
     public ResponseEntity delete(@PathParam("id1 id2")
                                  @Parameter(description = "Pasar el id de la lista id1 y pasar el id de la canción id2")
                                  @PathVariable("id1") Long id1, @PathVariable("id2") Long id) {
-        if (playlistService.findById(id1).isPresent() && songService.findById(id).isPresent()) {
-            Song s = songService.findById(id).orElse(null);
-            playlistService.findById(id1).get().getSongs()
-                    .stream().filter(song -> song.equals(s))
-                    .forEach(song -> song.setTitle(null));
+        Song s = songService.findById(id).get();
 
+        if (playlistService.findById(id1).isPresent() && songService.findById(id).isPresent()
+                && playlistService.findById(id1).get().getSongs().contains(s)) {
+            playlistService.findById(id1).get().getSongs().remove(s);
+            playlistService.edit(playlistService.findById(id1).get());
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
 
@@ -305,7 +309,7 @@ public class PlayListController {
         if (playlistService.findById(id1).isPresent() && songService.findById(id).isPresent()) {
             Song s = songService.findById(id).orElse(null);
             playlistService.findById(id1).get().getSongs().add(s);
-            return ResponseEntity.ok(playlistService.findById(id1).orElse(null));
+            return ResponseEntity.ok(playlistService.findById(id1).get());
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
