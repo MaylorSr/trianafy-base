@@ -236,7 +236,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/song/5",
+							"raw": "http://localhost:8080/song/11",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -244,7 +244,7 @@
 							"port": "8080",
 							"path": [
 								"song",
-								"5"
+								"11"
 							]
 						}
 					},
@@ -359,7 +359,7 @@
 							}
 						},
 						"url": {
-							"raw": "http://localhost:8080/list/13",
+							"raw": "http://localhost:8080/list/12",
 							"protocol": "http",
 							"host": [
 								"localhost"
@@ -367,7 +367,7 @@
 							"port": "8080",
 							"path": [
 								"list",
-								"13"
+								"12"
 							]
 						}
 					},
@@ -378,27 +378,6 @@
 		{
 			"name": "GestionList",
 			"item": [
-				{
-					"name": "GetSongsList",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "http://localhost:8080/list/12/song",
-							"protocol": "http",
-							"host": [
-								"localhost"
-							],
-							"port": "8080",
-							"path": [
-								"list",
-								"12",
-								"song"
-							]
-						}
-					},
-					"response": []
-				},
 				{
 					"name": "GetSongByList",
 					"request": {
