@@ -81,9 +81,9 @@ public class SongController {
     })
 
     @GetMapping("/{id}")
-    public ResponseEntity<Song> findById(@PathParam("ID") @Parameter(description = "Poner el ID de la canción") @PathVariable Long id) {
+    public ResponseEntity<SongResponse> findById(@PathParam("ID") @Parameter(description = "Poner el ID de la canción") @PathVariable Long id) {
         if (songService.findById(id).isPresent()) {
-            return ResponseEntity.of(songService.findById(id));
+            return ResponseEntity.ok(dtoConverter.songToSongResponse(songService.findById(id).get()));
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
@@ -133,7 +133,7 @@ public class SongController {
     public ResponseEntity<Song> create(@RequestBody CreateSongDto dto) {
         if (dto.getArtistId() != null && dto.getTitle() != "" && dto.getAlbum() != "") {
             Song nuevo = dtoConverter.createSongDtoToSong(dto);
-            Artist artist = artistService.findById(dto.getArtistId()).orElse(null);
+            Artist artist = artistService.findById(dto.getArtistId()).get();
             nuevo.setArtist(artist);
 
             return ResponseEntity
@@ -173,7 +173,7 @@ public class SongController {
     public ResponseEntity<SongResponse> editSong(@PathParam("ID") @Parameter(description = "Poner el ID de la canción a editar")
                                                  @RequestBody Song song, @PathVariable Long id) {
 
-        Song data = songService.findById(id).orElse(null);
+        Song data = songService.findById(id).get();
 
         if (data.getId() == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
