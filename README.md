@@ -9,3 +9,5 @@ Para llevar a cabo el proyecto hemos de tener una estructura básica del proyect
 De las peticiones: [documentacion](http://localhost:8080/swagger-ui/index.html#/) recuerda que debes iniciar el proyecto para que puedas ver la documentación.
 
 ## Historia de Usuarios
+Se proporciona el siguiente link para poder visualizar las historias de usuarios: [historias de usuario](https://1drv.ms/x/s!Avokzfum2mgDlB3bwWcH1FZxKboa?e=H4UUFC)<br> En caso de no poder comprender como se ha diseñado este modelo, te proporcionamos una captura de pantalla de la plantilla para que puedas comprenderlo de manera más sencilla.
+![Captura de pantalla (538)](https://user-images.githubusercontent.com/93126452/204042197-26028712-7abf-47e1-8536-a3e797c0cdf4.png)
