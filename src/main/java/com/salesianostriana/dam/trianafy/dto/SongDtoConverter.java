@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SongDtoConverter {
 
-    public Song createSongDtoToSong(CreateSongDto s) {
+    public Song createSongDtoToSong(SongViewDto s) {
         return new Song(
                 s.getTitle(),
                 s.getAlbum(),
@@ -16,8 +16,8 @@ public class SongDtoConverter {
     }
 
 
-    public SongResponse songToSongResponse(Song song) {
-        return SongResponse
+    public SongViewDto songToSongResponse(Song song) {
+        return SongViewDto
                 .builder()
                 .title(song.getTitle())
                 .artist(song.getArtist().getName())
