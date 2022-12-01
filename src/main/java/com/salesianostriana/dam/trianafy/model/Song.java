@@ -27,9 +27,12 @@ public class Song {
     private Artist artist;
 
 
-    public Song(String title, String album, String year) {
+    public Song(Long id,String title, String album, String year) {
+        this.id = id;
         this.title = title;
         this.album = album;
         this.year = year;
     }
+
+
 }

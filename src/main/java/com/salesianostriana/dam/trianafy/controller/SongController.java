@@ -1,9 +1,6 @@
 package com.salesianostriana.dam.trianafy.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
-import com.salesianostriana.dam.trianafy.dto.CreateSongDto;
-import com.salesianostriana.dam.trianafy.dto.SongDtoConverter;
-import com.salesianostriana.dam.trianafy.dto.SongResponse;
 import com.salesianostriana.dam.trianafy.dto.SongViewDto;
 import com.salesianostriana.dam.trianafy.model.Artist;
 import com.salesianostriana.dam.trianafy.model.Song;
@@ -23,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.View;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
@@ -36,7 +32,6 @@ public class SongController {
 
     private final ArtistService artistService;
     private final SongService songService;
-    private final SongDtoConverter dtoConverter;
 
     private final SongViewDto dtoConverter2;
 
@@ -145,14 +140,14 @@ public class SongController {
     @JsonView(ViewSongCreate.CreateSongDto.class)
     public ResponseEntity<SongViewDto> create(@RequestBody SongViewDto dto) {
         if (dto.getArtistId() != null && dto.getTitle() != "" && dto.getAlbum() != "") {
-            Song nuevo = dtoConverter.createSongDtoToSong(dto);
+            Song nuevo = dtoConverter2.createSongDtoToSong(dto);
             Artist artist = artistService.findById(dto.getArtistId()).get();
             nuevo.setArtist(artist);
             songService.add(nuevo);
 
             return ResponseEntity
                     .status(HttpStatus.CREATED)
-                    .body(songService.add(nuevo));
+                    .body(dtoConverter2.songToSongResponse(nuevo));
         }
         return ResponseEntity.badRequest().build();
     }
@@ -184,15 +179,23 @@ public class SongController {
      * @return
      */
     @PutMapping("/{id}")
+    @JsonView(ViewSongCreate.CreateSongDto.class)
     public ResponseEntity<SongViewDto> editSong(@PathParam("ID") @Parameter(description = "Poner el ID de la canción a editar")
-                                                @RequestBody Song song, @PathVariable Long id) {
+                                                @RequestBody SongViewDto song, @PathVariable Long id) {
 
         Song data = songService.findById(id).get();
-
+        Song nuevo = dtoConverter2.createSongDtoToSong(song);
+        Artist artist = artistService.findById(song.getArtistId()).get();
         if (data.getId() == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         } else if (data.getId() != null && data.getTitle() != "" && data.getAlbum() != "") {
-            return ResponseEntity.ok().body(dtoConverter2.songToSongResponse(song));
+            data.setId(song.getId());
+            data.setTitle(song.getTitle());
+            data.setYear(song.getYear());
+            data.setAlbum(song.getAlbum());
+            data.setArtist(artist);
+            songService.edit(data);
+            return ResponseEntity.ok().body(dtoConverter2.songToSongResponse(nuevo));
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 

@@ -9,18 +9,23 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Component
 
 public class SongViewDto {
     @JsonView({ViewSong.SongResponse.class, ViewSongCreate.CreateSongDto.class})
+    @Id
+    @GeneratedValue
     private Long id;
     @JsonView({ViewSong.SongResponse.class, ViewSongCreate.CreateSongDto.class})
     private String title, album;
@@ -28,23 +33,21 @@ public class SongViewDto {
     @Column(name = "year_of_song")
     private String year;
 
-    @JsonView(ViewSong.SongResponse.class)
+    @JsonView({ViewSong.SongResponse.class, ViewSongCreate.CreateSongDto.class})
     private String artist;
 
     private Long artistId;
 
-    public SongViewDto createSongDtoToSong(SongViewDto s) {
-        return SongViewDto
-                .builder()
-                .id(s.getId())
-                .title(s.getTitle())
-                .artist(s.getArtist())
-                .album(s.getAlbum())
-                .year(s.getYear())
-                .build();
+    public Song createSongDtoToSong(SongViewDto s) {
+        return new Song(
+                s.getId(),
+                s.getTitle(),
+                s.getAlbum(),
+                s.getYear()
 
-
+        );
     }
+
 
     public SongViewDto songToSongResponse(Song song) {
         return SongViewDto
